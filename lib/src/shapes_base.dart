@@ -24,7 +24,7 @@ class ShapeStyle {
 }
 
 class ShapesCollection {
-  static Path _heart = Path()
+  static final Path _heart = Path()
     ..moveTo(75, 40)
     ..cubicTo(75, 37, 70, 25, 50, 25)
     ..cubicTo(20, 25, 20, 62.5, 20, 62.5)
@@ -44,7 +44,7 @@ class _ShapeCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = style.color;
-
+    canvas.translate(size.width / 2, size.height / 2);
     canvas.drawPath(shape.center(size), paint);
   }
 
@@ -58,6 +58,7 @@ extension PathOperations on Path {
   Path center(Size size) {
     final bbox = getBounds();
     final pathRect = Offset(bbox.center.dx, bbox.center.dy) & size;
-    return shift(Offset(-pathRect.left, -pathRect.top));
+
+    return shift(Offset(-pathRect.centerLeft.dx, -pathRect.topCenter.dy));
   }
 }
