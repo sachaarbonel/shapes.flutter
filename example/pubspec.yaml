@@ -27,6 +27,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_gradients: ^0.0.3
   shapes:
     path: ../
 

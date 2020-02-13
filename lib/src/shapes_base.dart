@@ -19,8 +19,9 @@ enum Shape { heart }
 
 class ShapeStyle {
   final Color color;
+  final Gradient gradient;
 
-  ShapeStyle({this.color});
+  ShapeStyle({this.color, this.gradient});
 }
 
 class ShapesCollection {
@@ -43,7 +44,8 @@ class _ShapeCustomPainter extends CustomPainter {
   _ShapeCustomPainter({this.shape, this.style});
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = style.color;
+    final paint = Paint()
+      ..shader = style.gradient.createShader(Offset.zero & size);
     canvas.translate(size.width / 2, size.height / 2);
     canvas.drawPath(shape.center(size), paint);
   }
@@ -51,7 +53,8 @@ class _ShapeCustomPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ShapeCustomPainter oldDelegate) => false;
   @override
-  bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) => false;
+  bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
+      false; //TODO: deal with semantics
 }
 
 extension PathOperations on Path {
