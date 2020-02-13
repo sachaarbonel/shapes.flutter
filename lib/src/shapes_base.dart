@@ -8,6 +8,8 @@ class Shapes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
+      size: Size(MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
           shape: ShapesCollection.getShape[shape], style: style),
       child: child ?? child,
@@ -51,7 +53,7 @@ class _ShapeCustomPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_ShapeCustomPainter oldDelegate) => false;
+  bool shouldRepaint(_ShapeCustomPainter oldDelegate) => true;
   @override
   bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
       false; //TODO: deal with semantics

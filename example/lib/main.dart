@@ -19,6 +19,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
+  var size;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,25 +28,59 @@ class MyHomePage extends StatelessWidget {
           title: Text('Shapes showcase'),
         ),
         body: Center(
-          child: Shapes(
-              // size : Size(30,30),
-              shape: Shape.heart,
-              style: ShapeStyle(
-                  color: Colors.blue,
-                  gradient: SweepGradient(
-                    startAngle: 0,
-                    endAngle: math.pi / 2,
-                    stops: [0.0, 1.0],
-                    tileMode: TileMode.mirror,
-                    colors: [
-                      stringToColor("#00c6fb"),
-                      stringToColor("#005bea")
-                    ],
-                  )),
-              child: Text(
-                'Flutter',
-                style: TextStyle(color: Colors.white),
-              )),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                height: 150,
+                width: 150,
+                child: Shapes(
+                    shape: Shape.heart,
+                    style: ShapeStyle(
+                        color: Colors.blue,
+                        gradient: SweepGradient(
+                          startAngle: 0,
+                          endAngle: math.pi / 2,
+                          stops: [0.0, 1.0],
+                          tileMode: TileMode.mirror,
+                          colors: [
+                            stringToColor("#00c6fb"),
+                            stringToColor("#005bea")
+                          ],
+                        )),
+                    child: Center(
+                      child: Text(
+                        'Flutter',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )),
+              ),
+              Container(
+                height: 150,
+                width: 150,
+                child: Shapes(
+                    shape: Shape.heart,
+                    style: ShapeStyle(
+                        color: Colors.blue,
+                        gradient: SweepGradient(
+                          startAngle: 0,
+                          endAngle: math.pi / 2,
+                          stops: [0.0, 1.0],
+                          tileMode: TileMode.mirror,
+                          colors: [
+                            stringToColor("#00c6fb"),
+                            stringToColor("#005bea")
+                          ],
+                        )),
+                    child: Center(
+                      child: Text(
+                        'Flutter',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )),
+              ),
+            ],
+          ),
         ));
   }
 }
