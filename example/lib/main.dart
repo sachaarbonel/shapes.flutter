@@ -27,7 +27,7 @@ class MyHomePage extends StatelessWidget {
           child: Shapes(
               shape: Shape.heart,
               style: ShapeStyle(color: Colors.blue),
-              child: Text('hey')),
+              child: Text('hey2')),
         ));
   }
 }
