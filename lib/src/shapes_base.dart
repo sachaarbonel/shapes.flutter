@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 class Shapes extends StatelessWidget {
   final Shape shape;
   final ShapeStyle style;
-  Shapes({this.shape, this.style});
+  final Widget child;
+  Shapes({this.shape, this.style, this. child});
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
         painter: _ShapeCustomPainter(
-            shape: ShapesCollection.getShape[shape], style: style));
+            shape: ShapesCollection.getShape[shape], style: style),child: child,);
   }
 }
 
@@ -54,12 +55,6 @@ class _ShapeCustomPainter extends CustomPainter {
     final paint = Paint()..color = style.color;
     canvas.drawPath(shape, paint);
   }
-
-  // Since this Sky painter has no fields, it always paints
-  // the same thing and semantics information is the same.
-  // Therefore we return false here. If we had fields (set
-  // from the constructor) then we would return true if any
-  // of them differed from the same fields on the oldDelegate.
   @override
   bool shouldRepaint(_ShapeCustomPainter oldDelegate) => false;
   @override
