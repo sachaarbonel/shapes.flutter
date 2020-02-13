@@ -39,6 +39,7 @@ class MyHomePage extends StatelessWidget {
                     shape: Shape.heart,
                     fill: true,
                     style: ShapeStyle(
+                        shapeSize: 30,
                         color: Colors.blue,
                         gradient: SweepGradient(
                           startAngle: 0,
@@ -64,6 +65,7 @@ class MyHomePage extends StatelessWidget {
                     fill: false,
                     shape: Shape.heart,
                     style: ShapeStyle(
+                        shapeSize: 30,
                         color: Colors.blue,
                         gradient: SweepGradient(
                           startAngle: 0,
@@ -78,8 +80,8 @@ class MyHomePage extends StatelessWidget {
                     child: Center(
                       child: GradientText(
                         'Flutter',
-                         style: TextStyle(color: Colors.blue),
-                         gradient: SweepGradient(
+                        style: TextStyle(color: Colors.blue),
+                        gradient: SweepGradient(
                           startAngle: 0,
                           endAngle: math.pi / 2,
                           stops: [0.0, 1.0],
@@ -88,8 +90,7 @@ class MyHomePage extends StatelessWidget {
                             stringToColor("#00c6fb"),
                             stringToColor("#005bea")
                           ],
-                        )
-                       ,
+                        ),
                       ),
                     )),
               ),

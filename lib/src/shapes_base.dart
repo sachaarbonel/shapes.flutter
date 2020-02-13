@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 class Shapes extends StatelessWidget {
   final Shape shape;
@@ -23,8 +24,9 @@ enum Shape { heart }
 class ShapeStyle {
   final Color color;
   final Gradient gradient;
+  final double shapeSize;
 
-  ShapeStyle({this.color, this.gradient});
+  ShapeStyle({this.color, this.gradient, this.shapeSize});
 }
 
 class ShapesCollection {
@@ -52,8 +54,11 @@ class _ShapeCustomPainter extends CustomPainter {
       ..shader = style.gradient.createShader(Offset.zero & size)
       ..style = fill ? PaintingStyle.fill : PaintingStyle.stroke;
 
+    canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
-    canvas.drawPath(shape.center(size), paint);
+    final scale = style.shapeSize / shape.getBounds().size.width;
+    canvas.drawPath(shape.center(size).scale(scale), paint);
+    canvas.restore();
   }
 
   @override
@@ -69,5 +74,9 @@ extension PathOperations on Path {
     final pathRect = Offset(bbox.center.dx, bbox.center.dy) & size;
 
     return shift(Offset(-pathRect.centerLeft.dx, -pathRect.topCenter.dy));
+  }
+
+  Path scale(double scale) {
+    return transform(Transform.scale(scale: scale).transform.storage);
   }
 }
