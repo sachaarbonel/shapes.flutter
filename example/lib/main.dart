@@ -29,72 +29,38 @@ class MyHomePage extends StatelessWidget {
           title: Text('Shapes showcase'),
         ),
         body: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                height: 150,
-                width: 150,
-                child: Shapes(
-                    shape: Shape.heart,
-                    fill: true,
-                    style: ShapeStyle(
-                        shapeSize: 180,
-                        color: Colors.blue,
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
-                          ],
-                        )),
-                    child: Center(
-                      child: Text(
-                        'Flutter',
-                        style: TextStyle(color: Colors.white),
-                      ),
+          child: Container(
+            height: 150,
+            width: 150,
+            child: Shapes(
+                shape: Shape.heart,
+                animation:
+                    ShapeAnimation(id: "heartAnimation", keyframes: <Keyframe>[
+                  ScaleKeyframe(step: 1, sx: 30, sy: 30, weight: 10),
+                  // TranslateKeyframe(step: 2, x: 110, y: 0, weight: 70),
+                  // RotateKeyframe(
+                  //     step: 3, angle: 45, cy: "top", weight: 90)
+                ]),
+                fill: true,
+                style: ShapeStyle(
+                    shapeSize: 10,
+                    color: Colors.blue,
+                    gradient: SweepGradient(
+                      startAngle: 0,
+                      endAngle: math.pi / 2,
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.mirror,
+                      colors: [
+                        stringToColor("#00c6fb"),
+                        stringToColor("#005bea")
+                      ],
                     )),
-              ),
-              Container(
-                height: 150,
-                width: 150,
-                child: Shapes(
-                    fill: false,
-                    shape: Shape.heart,
-                    style: ShapeStyle(
-                        shapeSize: 90,
-                        color: Colors.blue,
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
-                          ],
-                        )),
-                    child: Center(
-                      child: GradientText(
-                        'Flutter',
-                        style: TextStyle(color: Colors.blue),
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
-                          ],
-                        ),
-                      ),
-                    )),
-              ),
-            ],
+                child: Center(
+                  child: Text(
+                    'Flutter',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
           ),
         ));
   }

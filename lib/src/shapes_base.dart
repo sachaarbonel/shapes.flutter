@@ -1,32 +1,27 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 class Shapes extends StatefulWidget {
   final Shape shape;
   final ShapeStyle style;
   final Widget child;
   final bool fill;
-  Shapes({this.shape, this.style, this.child, this.fill});
+  final ShapeAnimation animation;
+  Shapes({this.shape, this.style, this.child, this.fill, this.animation});
 
   @override
   _ShapesState createState() => _ShapesState();
 }
 
 class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
-  Animation<double> scaleTween;
+  Animation<Offset> animation;
   AnimationController controller;
 
   @override
   void initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 1000), vsync: this);
-    scaleTween = TweenSequence(<TweenSequenceItem<double>>[
-      TweenSequenceItem<double>(
-        tween: Tween<double>(begin: 0, end: 1),
-        weight: 100.0,
-      )
-    ]).animate(controller)
+        duration: const Duration(milliseconds: 2000), vsync: this);
+    animation = widget.animation.tweenSequence().animate(controller)
       ..addListener(() {
         setState(() {});
       });
@@ -46,7 +41,7 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
           MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
           shape: ShapesCollection.getShape[widget.shape],
-          scaleTween: scaleTween.value,
+          progress: animation.value,
           style: widget.style,
           fill: widget.fill),
       child: widget.child ?? widget.child,
@@ -82,8 +77,8 @@ class _ShapeCustomPainter extends CustomPainter {
   final Path shape;
   final ShapeStyle style;
   final bool fill;
-  final double scaleTween;
-  _ShapeCustomPainter({this.shape, this.style, this.fill, this.scaleTween});
+  final Offset progress;
+  _ShapeCustomPainter({this.shape, this.style, this.fill, this.progress});
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -93,14 +88,14 @@ class _ShapeCustomPainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     final scale = style.shapeSize / shape.getBounds().size.width;
-    canvas.scale(scaleTween);
+    canvas.scale(progress.dx);
     canvas.drawPath(shape.center(size).scale(scale), paint);
     canvas.restore();
   }
 
   @override
   bool shouldRepaint(_ShapeCustomPainter oldDelegate) =>
-      oldDelegate.scaleTween != scaleTween;
+      oldDelegate.progress != progress;
   @override
   bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
       false; //TODO: deal with semantics
@@ -117,4 +112,130 @@ extension PathOperations on Path {
   Path scale(double scale) {
     return transform(Transform.scale(scale: scale).transform.storage);
   }
+}
+
+// class Timeline {
+//   final List<ShapeAnimation> animations;
+
+//   Timeline({
+//     @required this.animations,
+//   });
+
+//   factory Timeline.fromJson(Map<String, dynamic> json) => Timeline(
+//         animations: List<ShapeAnimation>.from(
+//             json["animations"].map((x) => ShapeAnimation.fromJson(x))),
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "animations": List<dynamic>.from(animations.map((x) => x.toJson())),
+//       };
+// }
+
+class ShapeAnimation {
+  final String id;
+  final List<Keyframe> keyframes;
+
+  ShapeAnimation({
+    @required this.id,
+    @required this.keyframes,
+  });
+  factory ShapeAnimation.fromJson(Map<String, dynamic> json) => ShapeAnimation(
+        id: json["id"],
+        keyframes: List<Keyframe>.from(
+            json["animations"].map((x) => Keyframe.fromJson(x))),
+      );
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "keyframes": List<dynamic>.from(keyframes.map((x) => x.toJson())),
+      };
+
+  TweenSequence<Offset> tweenSequence() =>
+      TweenSequence<Offset>([...translations(), ...scales()]);
+
+  List<TweenSequenceItem<Offset>> translations() => keyframes
+      .whereType<TranslateKeyframe>()
+      .map((keyframe) => TweenSequenceItem(
+          weight: keyframe.weight,
+          tween:
+              Tween(begin: Offset(0, 0), end: Offset(keyframe.x, keyframe.y))))
+      .toList();
+
+  List<TweenSequenceItem<Offset>> scales() => keyframes
+      .whereType<ScaleKeyframe>()
+      .map((keyframe) => TweenSequenceItem(
+          weight: keyframe.weight,
+          tween:
+              Tween(begin: Offset(0, 0), end: Offset(keyframe.x, keyframe.y))))
+      .toList();
+}
+
+class TranslateKeyframe extends Keyframe {
+  TranslateKeyframe(
+      {int step, double x, double y, String cy, String easing, double weight})
+      : super(step: step, x: x, y: y, cy: cy, easing: easing, weight: weight);
+}
+
+class ScaleKeyframe extends Keyframe {
+  ScaleKeyframe(
+      {int step, double sx, double sy, String cy, String easing, double weight})
+      : super(step: step, x: sx, y: sy, cy: cy, easing: easing, weight: weight);
+}
+
+class RotateKeyframe extends Keyframe {
+  final int angle;
+
+  RotateKeyframe(
+      {@required int step,
+      @required this.angle,
+      @required String cy,
+      String easing,
+      double weight})
+      : super(step: step, cy: cy, easing: easing, weight: weight);
+
+  factory RotateKeyframe.fromJson(Map<String, dynamic> json) => RotateKeyframe(
+        step: json["step"] == null ? null : json["step"],
+        angle: json["angle"] == null ? null : json["angle"],
+        cy: json["cy"] == null ? null : json["cy"],
+        easing: json["easing"] == null ? null : json["easing"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "step": step == null ? null : step,
+        "angle": angle == null ? null : angle,
+        "cy": cy == null ? null : cy,
+        "easing": easing == null ? null : easing,
+      };
+}
+
+class Keyframe {
+  final int step;
+  final double x;
+  final double y;
+  final String cy;
+  final String easing;
+  final double weight; //TODO: to json
+
+  Keyframe(
+      {@required this.step,
+      this.x,
+      this.y,
+      @required this.cy,
+      @required this.easing,
+      @required this.weight});
+
+  factory Keyframe.fromJson(Map<String, dynamic> json) => Keyframe(
+        step: json["step"] == null ? null : json["step"],
+        x: json["x"] == null ? null : json["x"],
+        y: json["y"] == null ? null : json["y"],
+        cy: json["cy"] == null ? null : json["cy"],
+        easing: json["easing"] == null ? null : json["easing"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "step": step == null ? null : step,
+        "x": x == null ? null : x,
+        "y": y == null ? null : y,
+        "cy": cy == null ? null : cy,
+        "easing": easing == null ? null : easing,
+      };
 }
