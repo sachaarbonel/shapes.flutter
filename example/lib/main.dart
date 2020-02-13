@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shapes/shapes.dart';
 import 'package:flutter_gradients/flutter_gradients.dart';
+import 'package:gradient_text/gradient_text.dart';
 import 'dart:math' as math;
 
 void main() => runApp(MyApp());
@@ -36,6 +37,7 @@ class MyHomePage extends StatelessWidget {
                 width: 150,
                 child: Shapes(
                     shape: Shape.heart,
+                    fill: true,
                     style: ShapeStyle(
                         color: Colors.blue,
                         gradient: SweepGradient(
@@ -59,6 +61,7 @@ class MyHomePage extends StatelessWidget {
                 height: 150,
                 width: 150,
                 child: Shapes(
+                    fill: false,
                     shape: Shape.heart,
                     style: ShapeStyle(
                         color: Colors.blue,
@@ -73,9 +76,20 @@ class MyHomePage extends StatelessWidget {
                           ],
                         )),
                     child: Center(
-                      child: Text(
+                      child: GradientText(
                         'Flutter',
-                        style: TextStyle(color: Colors.white),
+                         style: TextStyle(color: Colors.blue),
+                         gradient: SweepGradient(
+                          startAngle: 0,
+                          endAngle: math.pi / 2,
+                          stops: [0.0, 1.0],
+                          tileMode: TileMode.mirror,
+                          colors: [
+                            stringToColor("#00c6fb"),
+                            stringToColor("#005bea")
+                          ],
+                        )
+                       ,
                       ),
                     )),
               ),

@@ -4,14 +4,15 @@ class Shapes extends StatelessWidget {
   final Shape shape;
   final ShapeStyle style;
   final Widget child;
-  Shapes({this.shape, this.style, this.child});
+  final bool fill;
+  Shapes({this.shape, this.style, this.child, this.fill});
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size(MediaQuery.of(context).size.width,
           MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
-          shape: ShapesCollection.getShape[shape], style: style),
+          shape: ShapesCollection.getShape[shape], style: style, fill: fill),
       child: child ?? child,
     );
   }
@@ -43,11 +44,14 @@ class ShapesCollection {
 class _ShapeCustomPainter extends CustomPainter {
   final Path shape;
   final ShapeStyle style;
-  _ShapeCustomPainter({this.shape, this.style});
+  final bool fill;
+  _ShapeCustomPainter({this.shape, this.style, this.fill});
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = style.gradient.createShader(Offset.zero & size);
+      ..shader = style.gradient.createShader(Offset.zero & size)
+      ..style = fill ? PaintingStyle.fill : PaintingStyle.stroke;
+
     canvas.translate(size.width / 2, size.height / 2);
     canvas.drawPath(shape.center(size), paint);
   }
