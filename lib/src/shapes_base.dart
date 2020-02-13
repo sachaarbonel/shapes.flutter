@@ -1,20 +1,55 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-class Shapes extends StatelessWidget {
+class Shapes extends StatefulWidget {
   final Shape shape;
   final ShapeStyle style;
   final Widget child;
   final bool fill;
   Shapes({this.shape, this.style, this.child, this.fill});
+
+  @override
+  _ShapesState createState() => _ShapesState();
+}
+
+class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
+  Animation<double> scaleTween;
+  AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
+    scaleTween = TweenSequence(<TweenSequenceItem<double>>[
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 0, end: 1),
+        weight: 100.0,
+      )
+    ]).animate(controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    controller.forward();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size(MediaQuery.of(context).size.width,
           MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
-          shape: ShapesCollection.getShape[shape], style: style, fill: fill),
-      child: child ?? child,
+          shape: ShapesCollection.getShape[widget.shape],
+          scaleTween: scaleTween.value,
+          style: widget.style,
+          fill: widget.fill),
+      child: widget.child ?? widget.child,
     );
   }
 }
@@ -47,7 +82,8 @@ class _ShapeCustomPainter extends CustomPainter {
   final Path shape;
   final ShapeStyle style;
   final bool fill;
-  _ShapeCustomPainter({this.shape, this.style, this.fill});
+  final double scaleTween;
+  _ShapeCustomPainter({this.shape, this.style, this.fill, this.scaleTween});
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -57,12 +93,14 @@ class _ShapeCustomPainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     final scale = style.shapeSize / shape.getBounds().size.width;
+    canvas.scale(scaleTween);
     canvas.drawPath(shape.center(size).scale(scale), paint);
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_ShapeCustomPainter oldDelegate) => true;
+  bool shouldRepaint(_ShapeCustomPainter oldDelegate) =>
+      oldDelegate.scaleTween != scaleTween;
   @override
   bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
       false; //TODO: deal with semantics

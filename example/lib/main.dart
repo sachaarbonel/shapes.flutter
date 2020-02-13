@@ -39,7 +39,7 @@ class MyHomePage extends StatelessWidget {
                     shape: Shape.heart,
                     fill: true,
                     style: ShapeStyle(
-                        shapeSize: 30,
+                        shapeSize: 180,
                         color: Colors.blue,
                         gradient: SweepGradient(
                           startAngle: 0,
@@ -65,7 +65,7 @@ class MyHomePage extends StatelessWidget {
                     fill: false,
                     shape: Shape.heart,
                     style: ShapeStyle(
-                        shapeSize: 30,
+                        shapeSize: 90,
                         color: Colors.blue,
                         gradient: SweepGradient(
                           startAngle: 0,
