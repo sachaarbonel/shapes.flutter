@@ -21,53 +21,147 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-        duration: Duration(milliseconds: widget.animation.duration),
-        vsync: this);
-    final Animation<double> easeSelection =
-        CurvedAnimation(parent: controller, curve: widget.animation.curve);
+    if (widget.animation != null) {
+      controller = AnimationController(
+          duration: Duration(milliseconds: widget.animation.duration),
+          vsync: this);
+      final Animation<double> easeSelection =
+          CurvedAnimation(parent: controller, curve: widget.animation.curve);
 
-    //  Cubic ElasticInCurve ElasticInOutCurve ElasticOutCurve FlippedCurve Interval SawTooth Threshold
-
-    translations = TweenSequence<Offset>([...widget.animation.translations()])
-        .animate(easeSelection)
-          ..addListener(() {
-            setState(() {});
-          });
-    scales = TweenSequence<Offset>([...widget.animation.scales()])
-        .animate(easeSelection) //TODO : move this in Scaleanimation
-          ..addListener(() {
-            setState(() {});
-          });
-    rotations = TweenSequence<double>([...widget.animation.rotations()])
-        .animate(easeSelection)
-          ..addListener(() {
-            setState(() {});
-          });
-    controller.forward();
+      //  Cubic ElasticInCurve ElasticInOutCurve ElasticOutCurve FlippedCurve Interval SawTooth Threshold
+      animations[widget.animation.shapeTransforms](easeSelection);
+      print('are we ere');
+      controller.forward();
+    }
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    if (controller != null) controller.dispose();
     super.dispose();
   }
 
+  Widget rotate({Widget child}) =>
+      Transform.rotate(angle: rotations.value, child: child);
+  Widget scale({Widget child}) =>
+      Transform.scale(scale: scales.value.dx, child: child);
+
+  Widget translate({Widget child}) =>
+      Transform.translate(offset: translations.value, child: child);
+
+  Widget painter({Widget child}) => child;
+
+  Widget scaleAndRotate({Widget child}) => scale(child: rotate(child: child));
+
+  Widget scaleAndTranslate({Widget child}) =>
+      scale(child: translate(child: child));
+
+  Widget translateAndRotate({Widget child}) =>
+      translate(child: rotate(child: child));
+
+  Widget all({Widget child}) =>
+      translate(child: rotate(child: scale(child: child)));
+
+  Map<ShapeTransforms, Widget Function({Widget child})> get transformations =>
+      <ShapeTransforms, Widget Function({Widget child})>{
+        ShapeTransforms.none: painter,
+        ShapeTransforms.onlyRotate: rotate,
+        ShapeTransforms.onlyScale: scale,
+        ShapeTransforms.onlyTranslate: translate,
+        ShapeTransforms.scaleAndRotate: scaleAndRotate,
+        ShapeTransforms.scaleAndTranslate: scaleAndTranslate,
+        ShapeTransforms.translateAndRotate: translateAndRotate,
+        ShapeTransforms.all: all
+      };
+
+  void doNothing(Animation<double> easeSelection) => print('hey');
+  void mutateRotate(Animation<double> easeSelection) {
+    rotations = widget.animation.rotateAnimation(easeSelection)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  void mutateScale(Animation<double> easeSelection) {
+    scales = widget.animation.scaleAnimation(easeSelection)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  void mutateTranslate(Animation<double> easeSelection) {
+    translations = widget.animation.translateAnimation(easeSelection)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  void mutateScaleAndRotate(Animation<double> easeSelection) {
+    mutateScale(easeSelection);
+    mutateRotate(easeSelection);
+  }
+
+  void mutateScaleAndTranslate(Animation<double> easeSelection) {
+    mutateScale(easeSelection);
+    mutateTranslate(easeSelection);
+  }
+
+  void mutateTranslateAndRotate(Animation<double> easeSelection) {
+    mutateTranslate(easeSelection);
+    mutateRotate(easeSelection);
+  }
+
+  void mutateAll(Animation<double> easeSelection) {
+    mutateTranslate(easeSelection);
+    mutateRotate(easeSelection);
+    mutateScale(easeSelection);
+  }
+
+  Map<ShapeTransforms, void Function(Animation<double>)> get animations =>
+      <ShapeTransforms, void Function(Animation<double>)>{
+        ShapeTransforms.none: doNothing,
+        ShapeTransforms.onlyRotate: mutateRotate,
+        ShapeTransforms.onlyScale: mutateScale,
+        ShapeTransforms.onlyTranslate: mutateTranslate,
+        ShapeTransforms.scaleAndRotate: mutateScaleAndRotate,
+        ShapeTransforms.scaleAndTranslate: mutateScaleAndTranslate,
+        ShapeTransforms.translateAndRotate: mutateTranslateAndRotate,
+        ShapeTransforms.all: mutateAll
+      };
+
   @override
   Widget build(BuildContext context) {
-    return  CustomPaint(
-      size: Size(MediaQuery.of(context).size.width,
-          MediaQuery.of(context).size.height),
-      painter: _ShapeCustomPainter(
-          shape: widget.path,
-          scaleProgress: scales.value,
-          translationProgress: translations.value,
-          rotationProgress: rotations.value,
-          style: widget.style,
-          fill: widget.fill),
-      child: widget.child ?? widget.child,
-    );
+    // print(widget.animation.shapeTransforms);
+    return ShapeTransform(
+        transformations: transformations,
+        shapeTransforms: widget.animation != null
+            ? widget.animation.shapeTransforms
+            : ShapeTransforms.none,
+        child: CustomPaint(
+          size: Size(MediaQuery.of(context).size.width,
+              MediaQuery.of(context).size.height),
+          painter: _ShapeCustomPainter(
+              shape: widget.path, style: widget.style, fill: widget.fill),
+          child: widget.child,
+        ));
   }
+}
+
+class ShapeTransform extends StatelessWidget {
+  const ShapeTransform({
+    Key key,
+    @required this.transformations,
+    @required this.shapeTransforms,
+    @required this.child,
+  }) : super(key: key);
+
+  final Map<ShapeTransforms, Widget Function({Widget child})> transformations;
+  final ShapeTransforms shapeTransforms;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      transformations[shapeTransforms](child: child);
 }
 
 enum ShapeForm { heart }
@@ -93,8 +187,8 @@ class ShapeStyle {
 }
 
 class ShapesCollection {
-const ShapesCollection();
-   static Path heart()=> Path()
+  const ShapesCollection();
+  static Path heart() => Path()
     ..moveTo(75, 40)
     ..cubicTo(75, 37, 70, 25, 50, 25)
     ..cubicTo(20, 25, 20, 62.5, 20, 62.5)
@@ -109,16 +203,11 @@ class _ShapeCustomPainter extends CustomPainter {
   final Path shape;
   final ShapeStyle style;
   final bool fill;
-  final Offset scaleProgress;
-  final double rotationProgress;
-  final Offset translationProgress;
-  const _ShapeCustomPainter(
-      {this.shape,
-      this.style,
-      this.fill,
-      this.scaleProgress,
-      this.rotationProgress,
-      this.translationProgress});
+  const _ShapeCustomPainter({
+    this.shape,
+    this.style,
+    this.fill,
+  });
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -128,16 +217,12 @@ class _ShapeCustomPainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     final scale = style.shapeSize / shape.getBounds().size.width;
-    canvas.scale(scaleProgress.dx);
-    canvas.translate(translationProgress.dx, translationProgress.dy);
-    canvas.rotate(rotationProgress);
     canvas.drawPath(shape.center(size).scale(scale), paint);
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_ShapeCustomPainter oldDelegate) =>
-      oldDelegate.scaleProgress != scaleProgress;
+  bool shouldRepaint(_ShapeCustomPainter oldDelegate) => false;
   @override
   bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
       false; //TODO: deal with semantics
@@ -173,6 +258,17 @@ extension PathOperations on Path {
 //       };
 // }
 
+enum ShapeTransforms {
+  onlyRotate,
+  onlyScale,
+  onlyTranslate,
+  scaleAndRotate,
+  scaleAndTranslate,
+  translateAndRotate,
+  all,
+  none
+}
+
 class ShapeAnimation {
   final String id;
   final List<Keyframe> keyframes;
@@ -195,28 +291,68 @@ class ShapeAnimation {
         "keyframes": List<dynamic>.from(keyframes.map((x) => x.toJson())),
       };
 
-  List<TweenSequenceItem<Offset>> translations() => keyframes
-      .whereType<TranslateKeyframe>()
-      .map((keyframe) => TweenSequenceItem(
-          weight: keyframe.weight,
-          tween:
-              Tween(begin: Offset(0, 0), end: Offset(keyframe.x, keyframe.y))))
-      .toList();
+  ShapeTransforms get shapeTransforms {
+    if (canTranslate & canRotate & canScale) {
+      return ShapeTransforms.all;
+    }
 
-  List<TweenSequenceItem<Offset>> scales() => keyframes
-      .whereType<ScaleKeyframe>()
-      .map((keyframe) => TweenSequenceItem(
-          weight: keyframe.weight,
-          tween:
-              Tween(begin: Offset(0, 0), end: Offset(keyframe.x, keyframe.y))))
-      .toList();
+    if (canTranslate & canRotate) {
+      return ShapeTransforms.translateAndRotate;
+    }
 
-  List<TweenSequenceItem<double>> rotations() => keyframes
-      .whereType<RotateKeyframe>()
-      .map((keyframe) => TweenSequenceItem(
-          weight: keyframe.weight,
-          tween: Tween(begin: 0.0, end: keyframe.angle)))
-      .toList();
+    if (canScale & canTranslate) {
+      return ShapeTransforms.scaleAndTranslate;
+    }
+    if (canScale & canRotate) {
+      return ShapeTransforms.scaleAndRotate;
+    }
+    if (canScale) {
+      return ShapeTransforms.onlyScale;
+    }
+    if (canRotate) {
+      return ShapeTransforms.onlyRotate;
+    }
+    if (canTranslate) {
+      return ShapeTransforms.onlyTranslate;
+    }
+    print('we are in this state');
+    return ShapeTransforms.none;
+  }
+
+  bool get canScale => keyframes.whereType<ScaleKeyframe>().isNotEmpty;
+  bool get canTranslate => keyframes.whereType<TranslateKeyframe>().isNotEmpty;
+  bool get canRotate => keyframes.whereType<RotateKeyframe>().isNotEmpty;
+
+  Animation<Offset> translateAnimation(Animation<double> easeSelection) =>
+      TweenSequence<Offset>(keyframes
+              .whereType<TranslateKeyframe>()
+              .map((keyframe) => TweenSequenceItem(
+                  weight: keyframe.weight,
+                  tween: Tween(
+                      begin: Offset(0, 0),
+                      end: Offset(keyframe.x, keyframe.y))))
+              .toList())
+          .animate(easeSelection);
+
+  Animation<Offset> scaleAnimation(Animation<double> easeSelection) =>
+      TweenSequence<Offset>(keyframes
+              .whereType<ScaleKeyframe>()
+              .map((keyframe) => TweenSequenceItem(
+                  weight: keyframe.weight,
+                  tween: Tween(
+                      begin: Offset(0, 0),
+                      end: Offset(keyframe.x, keyframe.y))))
+              .toList())
+          .animate(easeSelection);
+
+  Animation<double> rotateAnimation(Animation<double> easeSelection) =>
+      TweenSequence<double>(keyframes
+              .whereType<RotateKeyframe>()
+              .map((keyframe) => TweenSequenceItem(
+                  weight: keyframe.weight,
+                  tween: Tween(begin: 0.0, end: keyframe.angle)))
+              .toList())
+          .animate(easeSelection);
 
   @override
   int get hashCode => hashValues(id, keyframes, duration, curve);

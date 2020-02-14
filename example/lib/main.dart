@@ -30,39 +30,35 @@ class MyHomePage extends StatelessWidget {
           child: Container(
             height: 150,
             width: 150,
-            child: Row(
-              children: <Widget>[
-                Shapes(
-                    path: ShapesCollection.heart(),
-                    animation: ShapeAnimation(
-                        duration: 3000,
-                        curve: Curves.easeIn,
-                        keyframes: <Keyframe>[
-                          ScaleKeyframe(step: 1, sx: 10, sy: 10, weight: 10),
-                          TranslateKeyframe(step: 2, x: 10, y: 10, weight: 70),
-                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                        ]),
-                    fill: true,
-                    style: ShapeStyle(
-                        shapeSize: 12,
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: <Color>[
-                            Color.fromARGB(255, 0, 198, 251),
-                            Color.fromARGB(255, 0, 91, 234)
-                          ],
-                        )),
-                    child: Center(
-                      child: Text(
-                        'Flutter',
-                        style: TextStyle(color: Colors.white),
-                      ),
+            child: Shapes(
+                path: ShapesCollection.heart(),
+                animation: ShapeAnimation(
+                    duration: 3000,
+                    curve: Curves.easeIn,
+                    keyframes: <Keyframe>[
+                      ScaleKeyframe(step: 1, sx: 1.5, sy: 10, weight: 10),
+                      TranslateKeyframe(step: 2, x: 100, y: 100, weight: 70),
+                      RotateKeyframe(step: 3, angle: 45.0, weight: 90)
+                    ]),
+                fill: true,
+                style: ShapeStyle(
+                    shapeSize: 100,
+                    gradient: SweepGradient(
+                      startAngle: 0,
+                      endAngle: math.pi / 2,
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.mirror,
+                      colors: <Color>[
+                        Color.fromARGB(255, 0, 198, 251),
+                        Color.fromARGB(255, 0, 91, 234)
+                      ],
                     )),
-              ],
-            ),
+                child: Center(
+                  child: Text(
+                    'Flutter',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
           ),
         ));
   }
