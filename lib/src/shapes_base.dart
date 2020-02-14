@@ -22,16 +22,12 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+        duration: Duration(milliseconds: widget.animation.duration),
+        vsync: this);
     final Animation<double> easeSelection = CurvedAnimation(
       parent: controller,
       curve: Curves.easeIn,
     );
-
-    // final Animation<double> easeRotation = CurvedAnimation(
-    //   parent: controller,
-    //   curve: Curves.easeIn,
-    // );
 
     translations = TweenSequence<Offset>([...widget.animation.translations()])
         .animate(easeSelection)
@@ -169,10 +165,12 @@ extension PathOperations on Path {
 class ShapeAnimation {
   final String id;
   final List<Keyframe> keyframes;
+  final int duration;
 
-  ShapeAnimation({
-    @required this.id,
+  const ShapeAnimation({
+    this.id,
     @required this.keyframes,
+    this.duration,
   });
   factory ShapeAnimation.fromJson(Map<String, dynamic> json) => ShapeAnimation(
         id: json["id"],
@@ -183,10 +181,7 @@ class ShapeAnimation {
         "id": id,
         "keyframes": List<dynamic>.from(keyframes.map((x) => x.toJson())),
       };
-
-  // TweenSequence<Offset> tweenSequence() =>
-  //     TweenSequence<Offset>([...translations(), ...scales()]);
-
+      
   List<TweenSequenceItem<Offset>> translations() => keyframes
       .whereType<TranslateKeyframe>()
       .map((keyframe) => TweenSequenceItem(
@@ -227,11 +222,7 @@ class RotateKeyframe extends Keyframe {
   final double angle;
 
   RotateKeyframe(
-      {@required int step,
-      @required this.angle,
-      @required String cy,
-      String easing,
-      double weight})
+      {int step, @required this.angle, String cy, String easing, double weight})
       : super(step: step, cy: cy, easing: easing, weight: weight);
 
   factory RotateKeyframe.fromJson(Map<String, dynamic> json) => RotateKeyframe(
