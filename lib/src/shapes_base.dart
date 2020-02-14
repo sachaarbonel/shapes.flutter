@@ -13,7 +13,9 @@ class Shapes extends StatefulWidget {
 }
 
 class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
-  Animation<Offset> animation;
+  Animation<Offset> translations;
+  Animation<Offset> scales;
+  Animation<double> rotations;
   AnimationController controller;
 
   @override
@@ -21,10 +23,31 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
     super.initState();
     controller = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
-    animation = widget.animation.tweenSequence().animate(controller)
-      ..addListener(() {
-        setState(() {});
-      });
+    final Animation<double> easeSelection = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeIn,
+    );
+
+    // final Animation<double> easeRotation = CurvedAnimation(
+    //   parent: controller,
+    //   curve: Curves.easeIn,
+    // );
+
+    translations = TweenSequence<Offset>([...widget.animation.translations()])
+        .animate(easeSelection)
+          ..addListener(() {
+            setState(() {});
+          });
+    scales = TweenSequence<Offset>([...widget.animation.scales()])
+        .animate(easeSelection) //TODO : move this in Scaleanimation
+          ..addListener(() {
+            setState(() {});
+          });
+    rotations = TweenSequence<double>([...widget.animation.rotations()])
+        .animate(easeSelection)
+          ..addListener(() {
+            setState(() {});
+          });
     controller.forward();
   }
 
@@ -41,7 +64,9 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
           MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
           shape: ShapesCollection.getShape[widget.shape],
-          progress: animation.value,
+          scaleProgress: scales.value,
+          translationProgress: translations.value,
+          rotationProgress: rotations.value,
           style: widget.style,
           fill: widget.fill),
       child: widget.child ?? widget.child,
@@ -77,8 +102,16 @@ class _ShapeCustomPainter extends CustomPainter {
   final Path shape;
   final ShapeStyle style;
   final bool fill;
-  final Offset progress;
-  _ShapeCustomPainter({this.shape, this.style, this.fill, this.progress});
+  final Offset scaleProgress;
+  final double rotationProgress;
+  final Offset translationProgress;
+  _ShapeCustomPainter(
+      {this.shape,
+      this.style,
+      this.fill,
+      this.scaleProgress,
+      this.rotationProgress,
+      this.translationProgress});
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -88,14 +121,16 @@ class _ShapeCustomPainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     final scale = style.shapeSize / shape.getBounds().size.width;
-    canvas.scale(progress.dx);
+    canvas.scale(scaleProgress.dx);
+    canvas.translate(translationProgress.dx, translationProgress.dy);
+    canvas.rotate(rotationProgress);
     canvas.drawPath(shape.center(size).scale(scale), paint);
     canvas.restore();
   }
 
   @override
   bool shouldRepaint(_ShapeCustomPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+      oldDelegate.scaleProgress != scaleProgress;
   @override
   bool shouldRebuildSemantics(_ShapeCustomPainter oldDelegate) =>
       false; //TODO: deal with semantics
@@ -149,8 +184,8 @@ class ShapeAnimation {
         "keyframes": List<dynamic>.from(keyframes.map((x) => x.toJson())),
       };
 
-  TweenSequence<Offset> tweenSequence() =>
-      TweenSequence<Offset>([...translations(), ...scales()]);
+  // TweenSequence<Offset> tweenSequence() =>
+  //     TweenSequence<Offset>([...translations(), ...scales()]);
 
   List<TweenSequenceItem<Offset>> translations() => keyframes
       .whereType<TranslateKeyframe>()
@@ -167,6 +202,13 @@ class ShapeAnimation {
           tween:
               Tween(begin: Offset(0, 0), end: Offset(keyframe.x, keyframe.y))))
       .toList();
+
+  List<TweenSequenceItem<double>> rotations() => keyframes
+      .whereType<RotateKeyframe>()
+      .map((keyframe) => TweenSequenceItem(
+          weight: keyframe.weight,
+          tween: Tween(begin: 0.0, end: keyframe.angle)))
+      .toList();
 }
 
 class TranslateKeyframe extends Keyframe {
@@ -182,7 +224,7 @@ class ScaleKeyframe extends Keyframe {
 }
 
 class RotateKeyframe extends Keyframe {
-  final int angle;
+  final double angle;
 
   RotateKeyframe(
       {@required int step,

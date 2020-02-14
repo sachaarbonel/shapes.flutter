@@ -37,9 +37,8 @@ class MyHomePage extends StatelessWidget {
                 animation:
                     ShapeAnimation(id: "heartAnimation", keyframes: <Keyframe>[
                   ScaleKeyframe(step: 1, sx: 30, sy: 30, weight: 10),
-                  // TranslateKeyframe(step: 2, x: 110, y: 0, weight: 70),
-                  // RotateKeyframe(
-                  //     step: 3, angle: 45, cy: "top", weight: 90)
+                  TranslateKeyframe(step: 2, x: 50, y: 0, weight: 70),
+                  RotateKeyframe(step: 3, angle: 45.0, cy: "top", weight: 90)
                 ]),
                 fill: true,
                 style: ShapeStyle(
