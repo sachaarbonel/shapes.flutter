@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Shapes extends StatefulWidget {
-  final Shape shape;
+  final Path path;
   final ShapeStyle style;
   final Widget child;
   final bool fill;
   final ShapeAnimation animation;
-  Shapes({this.shape, this.style, this.child, this.fill, this.animation});
+  const Shapes({this.path, this.style, this.child, this.fill, this.animation});
 
   @override
   _ShapesState createState() => _ShapesState();
@@ -55,11 +55,11 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
+    return  CustomPaint(
       size: Size(MediaQuery.of(context).size.width,
           MediaQuery.of(context).size.height),
       painter: _ShapeCustomPainter(
-          shape: ShapesCollection.getShape[widget.shape],
+          shape: widget.path,
           scaleProgress: scales.value,
           translationProgress: translations.value,
           rotationProgress: rotations.value,
@@ -70,18 +70,31 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
   }
 }
 
-enum Shape { heart }
+enum ShapeForm { heart }
 
 class ShapeStyle {
   final Color color;
   final Gradient gradient;
   final double shapeSize;
 
-  ShapeStyle({this.color, this.gradient, this.shapeSize});
+  const ShapeStyle({this.color, this.gradient, this.shapeSize});
+
+  @override
+  int get hashCode => hashValues(color, gradient, shapeSize);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShapeStyle &&
+          runtimeType == other.runtimeType &&
+          color == other.color &&
+          other.gradient == gradient &&
+          shapeSize == other.shapeSize;
 }
 
 class ShapesCollection {
-  static final Path _heart = Path()
+const ShapesCollection();
+   static Path heart()=> Path()
     ..moveTo(75, 40)
     ..cubicTo(75, 37, 70, 25, 50, 25)
     ..cubicTo(20, 25, 20, 62.5, 20, 62.5)
@@ -90,8 +103,6 @@ class ShapesCollection {
     ..cubicTo(130, 62.5, 130, 25, 100, 25)
     ..cubicTo(85, 25, 75, 37, 75, 40)
     ..close();
-
-  static Map<Shape, Path> get getShape => <Shape, Path>{Shape.heart: _heart};
 }
 
 class _ShapeCustomPainter extends CustomPainter {
@@ -101,7 +112,7 @@ class _ShapeCustomPainter extends CustomPainter {
   final Offset scaleProgress;
   final double rotationProgress;
   final Offset translationProgress;
-  _ShapeCustomPainter(
+  const _ShapeCustomPainter(
       {this.shape,
       this.style,
       this.fill,
@@ -206,16 +217,29 @@ class ShapeAnimation {
           weight: keyframe.weight,
           tween: Tween(begin: 0.0, end: keyframe.angle)))
       .toList();
+
+  @override
+  int get hashCode => hashValues(id, keyframes, duration, curve);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShapeAnimation &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          duration == other.duration &&
+          keyframes == other.keyframes &&
+          curve == other.curve;
 }
 
 class TranslateKeyframe extends Keyframe {
-  TranslateKeyframe(
+  const TranslateKeyframe(
       {int step, double x, double y, String cy, String easing, double weight})
       : super(step: step, x: x, y: y, cy: cy, easing: easing, weight: weight);
 }
 
 class ScaleKeyframe extends Keyframe {
-  ScaleKeyframe(
+  const ScaleKeyframe(
       {int step, double sx, double sy, String cy, String easing, double weight})
       : super(step: step, x: sx, y: sy, cy: cy, easing: easing, weight: weight);
 }
@@ -223,7 +247,7 @@ class ScaleKeyframe extends Keyframe {
 class RotateKeyframe extends Keyframe {
   final double angle;
 
-  RotateKeyframe(
+  const RotateKeyframe(
       {int step, @required this.angle, String cy, String easing, double weight})
       : super(step: step, cy: cy, easing: easing, weight: weight);
 
@@ -250,7 +274,7 @@ class Keyframe {
   final String easing;
   final double weight; //TODO: to json
 
-  Keyframe(
+  const Keyframe(
       {@required this.step,
       this.x,
       this.y,
@@ -273,4 +297,18 @@ class Keyframe {
         "cy": cy == null ? null : cy,
         "easing": easing == null ? null : easing,
       };
+
+  @override
+  int get hashCode => hashValues(step, x, cy, easing, weight);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Keyframe &&
+          runtimeType == other.runtimeType &&
+          step == other.step &&
+          x == other.x &&
+          cy == other.cy &&
+          easing == other.easing &&
+          weight == other.weight;
 }

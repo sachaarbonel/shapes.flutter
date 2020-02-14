@@ -20,8 +20,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  var size;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,9 +33,9 @@ class MyHomePage extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Shapes(
-                    shape: Shape.heart,
+                    path: ShapesCollection.heart(),
                     animation: ShapeAnimation(
-                        duration: 5000,
+                        duration: 3000,
                         curve: Curves.easeIn,
                         keyframes: <Keyframe>[
                           ScaleKeyframe(step: 1, sx: 10, sy: 10, weight: 10),
@@ -46,76 +44,15 @@ class MyHomePage extends StatelessWidget {
                         ]),
                     fill: true,
                     style: ShapeStyle(
-                        shapeSize: 15,
+                        shapeSize: 12,
                         gradient: SweepGradient(
                           startAngle: 0,
                           endAngle: math.pi / 2,
                           stops: [0.0, 1.0],
                           tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
-                          ],
-                        )),
-                    child: Center(
-                      child: Text(
-                        'Flutter',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )),
-                Shapes(
-                    shape: Shape.heart,
-                    animation: ShapeAnimation(
-                        duration: 900,
-                        curve: Curves.easeIn,
-                        keyframes: <Keyframe>[
-                          ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
-                          TranslateKeyframe(
-                              step: 2, x: -10, y: -10, weight: 70),
-                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                        ]),
-                    fill: true,
-                    style: ShapeStyle(
-                        shapeSize: 10,
-                        color: Colors.blue,
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
-                          ],
-                        )),
-                    child: Center(
-                      child: Text(
-                        'Flutter',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )),
-                Shapes(
-                    shape: Shape.heart,
-                    animation: ShapeAnimation(
-                        duration: 900,
-                        curve: Curves.easeIn,
-                        keyframes: <Keyframe>[
-                          ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
-                          TranslateKeyframe(step: 2, x: 10, y: -10, weight: 70),
-                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                        ]),
-                    fill: true,
-                    style: ShapeStyle(
-                        shapeSize: 10,
-                        color: Colors.blue,
-                        gradient: SweepGradient(
-                          startAngle: 0,
-                          endAngle: math.pi / 2,
-                          stops: [0.0, 1.0],
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            stringToColor("#00c6fb"),
-                            stringToColor("#005bea")
+                          colors: <Color>[
+                            Color.fromARGB(255, 0, 198, 251),
+                            Color.fromARGB(255, 0, 91, 234)
                           ],
                         )),
                     child: Center(
