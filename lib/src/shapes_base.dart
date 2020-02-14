@@ -131,8 +131,7 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.animation.shapeTransforms);
-    return ShapeTransform(
+    return _ShapeTransform(
         transformations: transformations,
         shapeTransforms: widget.animation != null
             ? widget.animation.shapeTransforms
@@ -147,8 +146,8 @@ class _ShapesState extends State<Shapes> with SingleTickerProviderStateMixin {
   }
 }
 
-class ShapeTransform extends StatelessWidget {
-  const ShapeTransform({
+class _ShapeTransform extends StatelessWidget {
+  const _ShapeTransform({
     Key key,
     @required this.transformations,
     @required this.shapeTransforms,
@@ -163,8 +162,6 @@ class ShapeTransform extends StatelessWidget {
   Widget build(BuildContext context) =>
       transformations[shapeTransforms](child: child);
 }
-
-enum ShapeForm { heart }
 
 class ShapeStyle {
   final Color color;
@@ -216,7 +213,10 @@ class _ShapeCustomPainter extends CustomPainter {
 
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
-    final scale = style.shapeSize / shape.getBounds().size.width;
+    final shapeWidth =shape.getBounds().size.width;
+    final scale = style.shapeSize != null
+        ? style.shapeSize / shapeWidth
+        : size.width / shapeWidth;
     canvas.drawPath(shape.center(size).scale(scale), paint);
     canvas.restore();
   }
@@ -315,7 +315,6 @@ class ShapeAnimation {
     if (canTranslate) {
       return ShapeTransforms.onlyTranslate;
     }
-    print('we are in this state');
     return ShapeTransforms.none;
   }
 
