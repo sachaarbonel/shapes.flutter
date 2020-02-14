@@ -36,12 +36,14 @@ class MyHomePage extends StatelessWidget {
               children: <Widget>[
                 Shapes(
                     shape: Shape.heart,
-                    animation:
-                        ShapeAnimation(duration: 5000, keyframes: <Keyframe>[
-                      ScaleKeyframe(step: 1, sx: 10, sy: 10, weight: 10),
-                      TranslateKeyframe(step: 2, x: 10, y: 10, weight: 70),
-                      RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                    ]),
+                    animation: ShapeAnimation(
+                        duration: 5000,
+                        curve: Curves.easeIn,
+                        keyframes: <Keyframe>[
+                          ScaleKeyframe(step: 1, sx: 10, sy: 10, weight: 10),
+                          TranslateKeyframe(step: 2, x: 10, y: 10, weight: 70),
+                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
+                        ]),
                     fill: true,
                     style: ShapeStyle(
                         shapeSize: 15,
@@ -63,12 +65,15 @@ class MyHomePage extends StatelessWidget {
                     )),
                 Shapes(
                     shape: Shape.heart,
-                    animation:
-                        ShapeAnimation(duration: 900, keyframes: <Keyframe>[
-                      ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
-                      TranslateKeyframe(step: 2, x: -10, y: -10, weight: 70),
-                      RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                    ]),
+                    animation: ShapeAnimation(
+                        duration: 900,
+                        curve: Curves.easeIn,
+                        keyframes: <Keyframe>[
+                          ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
+                          TranslateKeyframe(
+                              step: 2, x: -10, y: -10, weight: 70),
+                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
+                        ]),
                     fill: true,
                     style: ShapeStyle(
                         shapeSize: 10,
@@ -91,12 +96,14 @@ class MyHomePage extends StatelessWidget {
                     )),
                 Shapes(
                     shape: Shape.heart,
-                    animation:
-                        ShapeAnimation(duration: 900, keyframes: <Keyframe>[
-                      ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
-                      TranslateKeyframe(step: 2, x: 10, y: -10, weight: 70),
-                      RotateKeyframe(step: 3, angle: 45.0, weight: 90)
-                    ]),
+                    animation: ShapeAnimation(
+                        duration: 900,
+                        curve: Curves.easeIn,
+                        keyframes: <Keyframe>[
+                          ScaleKeyframe(step: 1, sx: 15, sy: 15, weight: 10),
+                          TranslateKeyframe(step: 2, x: 10, y: -10, weight: 70),
+                          RotateKeyframe(step: 3, angle: 45.0, weight: 90)
+                        ]),
                     fill: true,
                     style: ShapeStyle(
                         shapeSize: 10,
@@ -116,8 +123,7 @@ class MyHomePage extends StatelessWidget {
                         'Flutter',
                         style: TextStyle(color: Colors.white),
                       ),
-                    )
-                    ),
+                    )),
               ],
             ),
           ),
